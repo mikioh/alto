@@ -14,7 +14,7 @@ type Directory struct {
 	Resources []DirectoryResource `json:"resources"`
 }
 
-// A DirResource represents a list of information resources.
+// A DirectoryResource represents a list of information resources.
 type DirectoryResource struct {
 	URI          string                 `json:"uri"`
 	MediaType    string                 `json:"media-type"`
