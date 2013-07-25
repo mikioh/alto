@@ -28,22 +28,7 @@ func TestDecodeEncodeCostMap(t *testing.T) {
 	if err := json.Indent(&out, dst.Bytes(), "", jsonIndent); err != nil {
 		t.Fatalf("json.Indent failed: %v", err)
 	} else {
-		//t.Logf("%v", string(out.Bytes()))
-	}
-}
-
-func TestDecodeEncodeCostMapData(t *testing.T) {
-	f, err := os.Open("testdata/costmapdata.js")
-	if err != nil {
-		t.Fatalf("os.Open failed: %v", err)
-	}
-	cmd := make(CostMapData)
-	if err := json.NewDecoder(f).Decode(&cmd); err != nil {
-		t.Fatalf("json.Decoder.Decode failed: %v", err)
-	}
-	var dst bytes.Buffer
-	if err := json.NewEncoder(&dst).Encode(&cmd); err != nil {
-		t.Fatalf("json.Encoder.Encode failed: %v", err)
+		t.Logf("%v", string(out.Bytes()))
 	}
 }
 

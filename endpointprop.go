@@ -24,13 +24,9 @@ type EndpointPropertyCapabilities struct {
 
 // An EndpointProperty represents a list of endpoint properties.
 type EndpointProperty struct {
-	VersionTag string                  `json:"map-vtag"`
-	Map        EndpointPropertyMapData `json:"map"`
+	VersionTag string                   `json:"map-vtag"`
+	Map        map[string]EndpointProps `json:"map"`
 }
-
-// An EndpointPropertyMapData represents a set of endpoint properties
-// for the given address types.
-type EndpointPropertyMapData map[string]EndpointProps
 
 // An EndpointProps represents a set of endpoint properties.
 type EndpointProps map[string]interface{}

@@ -14,8 +14,8 @@ const (
 // A NetworkMap represents a list of network locations within the
 // provider-defined identifier (PID).
 type NetworkMap struct {
-	VersionTag string         `json:"map-vtag"`
-	Map        NetworkMapData `json:"map"`
+	VersionTag string                       `json:"map-vtag"`
+	Map        map[string]EndpointAddrGroup `json:"map"`
 }
 
 // MarshalJSON implements the MarshalJSON method of json.Marshaler
@@ -23,7 +23,11 @@ type NetworkMap struct {
 func (nm *NetworkMap) MarshalJSON() ([]byte, error) {
 	raw := make(map[string]interface{})
 	raw["map-vtag"] = nm.VersionTag
-	raw["map"] = nm.Map.encode()
+	nmd := make(map[string]interface{})
+	for pid, v := range nm.Map {
+		nmd[pid] = v.encode()
+	}
+	raw["map"] = nmd
 	return json.Marshal(raw)
 }
 
@@ -41,9 +45,18 @@ func (nm *NetworkMap) UnmarshalJSON(b []byte) error {
 				nm.VersionTag = v
 			}
 		case "map":
-			nm.Map = make(NetworkMapData)
-			if err := nm.Map.decode(v); err != nil {
-				return err
+			if len(nm.Map) == 0 {
+				nm.Map = make(map[string]EndpointAddrGroup)
+			}
+			for pid, vv := range v.(map[string]interface{}) {
+				switch vv := vv.(type) {
+				case map[string]interface{}:
+					eag := make(EndpointAddrGroup)
+					if err := eag.decode(vv); err != nil {
+						return err
+					}
+					nm.Map[pid] = eag
+				}
 			}
 		}
 	}
@@ -58,18 +71,33 @@ func (nm *NetworkMap) resourceType() string {
 // provider-defined identifier (PID) name pid and address type
 // typ. The zero value for string is treated as wildcard.
 func (nm *NetworkMap) Endpoints(pid, typ string) []Endpoint {
-	eags := nm.Map.toSlice(pid)
+	eags := nm.toSlice(pid)
 	if eags == nil {
 		return nil
 	}
 	if len(eags) == 1 {
 		return eags[0].toSlice(typ)
 	}
-	var rs []Endpoint
+	var eps []Endpoint
 	for _, eag := range eags {
-		rs = append(rs, eag.toSlice(typ)...)
+		eps = append(eps, eag.toSlice(typ)...)
 	}
-	return rs
+	return eps
+}
+
+func (nm *NetworkMap) toSlice(pid string) []EndpointAddrGroup {
+	if pid != "" {
+		if eag, ok := nm.Map[pid]; !ok {
+			return nil
+		} else {
+			return []EndpointAddrGroup{eag}
+		}
+	}
+	var eags []EndpointAddrGroup
+	for _, eag := range nm.Map {
+		eags = append(eags, eag)
+	}
+	return eags
 }
 
 // Set sets the provider-defined identifier (PID) pid to endpoiint
@@ -88,63 +116,6 @@ func (nm *NetworkMap) Set(pid string, ep Endpoint) {
 		}
 		nm.Map[pid] = eag
 	}
-}
-
-// A NetworkMapData represents a set of endpoint addresses within the
-// provider-defined identifier (PID).
-type NetworkMapData map[string]EndpointAddrGroup
-
-// MarshalJSON implements the MarshalJSON method of json.Marshaler
-// interface.
-func (nmd NetworkMapData) MarshalJSON() ([]byte, error) {
-	return json.Marshal(nmd.encode())
-}
-
-func (nmd NetworkMapData) encode() interface{} {
-	raw := make(map[string]interface{})
-	for pid, v := range nmd {
-		raw[pid] = v.encode()
-	}
-	return raw
-}
-
-// UnmarshalJSON implements the UnmarshalJSON method of
-// json.Unmarshaler interface.
-func (nmd NetworkMapData) UnmarshalJSON(b []byte) error {
-	var raw interface{}
-	if err := json.Unmarshal(b, &raw); err != nil {
-		return err
-	}
-	return nmd.decode(raw)
-}
-
-func (nmd NetworkMapData) decode(raw interface{}) error {
-	for pid, v := range raw.(map[string]interface{}) {
-		switch v := v.(type) {
-		case map[string]interface{}:
-			eag := make(EndpointAddrGroup)
-			if err := eag.decode(v); err != nil {
-				return err
-			}
-			nmd[pid] = eag
-		}
-	}
-	return nil
-}
-
-func (nmd NetworkMapData) toSlice(pid string) []EndpointAddrGroup {
-	if pid != "" {
-		if eag, ok := nmd[pid]; !ok {
-			return nil
-		} else {
-			return []EndpointAddrGroup{eag}
-		}
-	}
-	var rs []EndpointAddrGroup
-	for _, eag := range nmd {
-		rs = append(rs, eag)
-	}
-	return rs
 }
 
 // A ReqFilteredNetworkMap represents input parameters for the

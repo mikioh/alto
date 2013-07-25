@@ -85,14 +85,14 @@ func (ep *IPEndpoint) TypedString() string {
 func parseIPEndpoint(s string) (ep *IPEndpoint, err error) {
 	_, addr := splitTypedAddr(s)
 	if ip := net.ParseIP(addr); ip != nil {
-		if ip4 := ip.To4(); ip4 != nil {
-			p, err := ipaddr.NewPrefix(ip4, ipaddr.IPv4PrefixLen)
+		if ipv4 := ip.To4(); ipv4 != nil {
+			p, err := ipaddr.NewPrefix(ipv4, ipaddr.IPv4PrefixLen)
 			if err != nil {
 				return nil, err
 			}
 			ep = &IPEndpoint{IP: p}
-		} else if ip6 := ip.To16(); ip6 != nil {
-			p, err := ipaddr.NewPrefix(ip6, ipaddr.IPv6PrefixLen)
+		} else if ipv6 := ip.To16(); ipv6 != nil {
+			p, err := ipaddr.NewPrefix(ipv6, ipaddr.IPv6PrefixLen)
 			if err != nil {
 				return nil, err
 			}

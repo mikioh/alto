@@ -24,9 +24,9 @@ type Data interface {
 func NewResource(typ string) *Resource {
 	switch typ {
 	case "networkmap":
-		return &Resource{Data: &NetworkMap{Map: make(NetworkMapData)}}
+		return &Resource{Data: &NetworkMap{Map: make(map[string]EndpointAddrGroup)}}
 	case "costmap":
-		return &Resource{Data: &CostMap{Map: make(CostMapData)}}
+		return &Resource{Data: &CostMap{Map: make(map[string]DstCosts)}}
 	default:
 		return &Resource{}
 	}

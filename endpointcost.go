@@ -12,27 +12,19 @@ const (
 // A ReqEndpointCostMap represents input parameters for the filtered
 // cost map.
 type ReqEndpointCostMap struct {
-	CostType    CostType       `json:"cost-type"`
-	Constraints []string       `json:"constraints,omitempty"`
-	Endpoints   EndpointFilter `json:"endpoints"`
-}
-
-// An EndpointFilter represents a list of source and destionation
-// endpoints for which path costs are to be returned.
-type EndpointFilter struct {
-	Srcs []Endpoint `json:"srcs,omitempty"`
-	Dsts []Endpoint `json:"dsts,omitempty"`
+	CostType    CostType `json:"cost-type"`
+	Constraints []string `json:"constraints,omitempty"`
+	Endpoints   struct {
+		Srcs []Endpoint `json:"srcs,omitempty"`
+		Dsts []Endpoint `json:"dsts,omitempty"`
+	} `json:"endpoints"`
 }
 
 // An EndpointCostMap reprensents a list of endpoint cost maps.
 type EndpointCostMap struct {
-	CostType CostType            `json:"cost-type"`
-	Map      EndpointCostMapData `json:"map"`
+	CostType CostType                    `json:"cost-type"`
+	Map      map[string]EndpointDstCosts `json:"map"`
 }
-
-// An EndpointCostMapData represents a set of endpoint cost maps for
-// the given destination endpoints.
-type EndpointCostMapData map[string]EndpointDstCosts
 
 // An EndpointDstCosts represents a set of endpoint cost maps.
 type EndpointDstCosts map[string]interface{}
