@@ -6,9 +6,10 @@ package alto
 
 import (
 	"encoding/json"
-	"github.com/mikioh/ipaddr"
 	"net"
 	"strings"
+
+	"github.com/mikioh/ipaddr"
 )
 
 // An Endpoint represents an endpoint address or address prefix.
