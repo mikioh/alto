@@ -61,7 +61,7 @@ func TestParseIPEndpoint(t *testing.T) {
 				t.Fatalf("got %v; expected %v/%v", ep, tt.ip, tt.prefixLen)
 			}
 		default:
-			t.Fatal("got unknown endpoint %v", ep)
+			t.Fatalf("got unknown endpoint %v", ep)
 		}
 	}
 }
@@ -90,7 +90,7 @@ func TestParseMACEndpoint(t *testing.T) {
 				t.Fatalf("got %v; expected %v", ep, tt.out)
 			}
 		default:
-			t.Fatal("got unknown endpoint %v", ep)
+			t.Fatalf("got unknown endpoint %v", ep)
 		}
 	}
 }
